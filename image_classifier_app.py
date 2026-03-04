@@ -10,18 +10,18 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS
+# Dark theme CSS
 st.markdown("""
 <style>
 
 .stApp {
-background: linear-gradient(135deg, #1f4037, #99f2c8);
-color: white;
+background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+color:white;
 }
 
-.title {
+.title{
 text-align:center;
-font-size:50px;
+font-size:48px;
 font-weight:bold;
 }
 
@@ -29,18 +29,28 @@ font-weight:bold;
 text-align:center;
 font-size:20px;
 margin-bottom:30px;
+color:#d3d3d3;
 }
 
-.result{
-font-size:30px;
+.prediction-card{
+background:#1f2a40;
+padding:25px;
+border-radius:15px;
+text-align:center;
+box-shadow:0px 6px 20px rgba(0,0,0,0.5);
+}
+
+.prediction-text{
+font-size:32px;
 font-weight:bold;
-color:#00ffcc;
+color:#00ffd5;
 }
 
 .footer{
 text-align:center;
-margin-top:50px;
+margin-top:40px;
 font-size:16px;
+color:#cccccc;
 }
 
 </style>
@@ -56,19 +66,17 @@ class_names = [
 
 # Header
 st.markdown("<div class='title'>🧠 AI Image Classifier</div>", unsafe_allow_html=True)
-
 st.markdown("<div class='subtitle'>Deep Learning CNN Model | Upload Image to Predict Object</div>", unsafe_allow_html=True)
 
 st.divider()
 
-# Upload
 uploaded_file = st.file_uploader("Upload Image", type=["jpg","png","jpeg"])
 
 if uploaded_file is not None:
 
     image = Image.open(uploaded_file)
 
-    col1,col2 = st.columns(2)
+    col1, col2 = st.columns(2)
 
     with col1:
         st.image(image, caption="Uploaded Image", use_container_width=True)
@@ -80,24 +88,28 @@ if uploaded_file is not None:
     prediction = model.predict(img)
 
     predicted_class = class_names[np.argmax(prediction)]
-    confidence = np.max(prediction)
+
+    confidence = float(np.max(tf.nn.softmax(prediction)))
 
     with col2:
+
+        st.markdown("<div class='prediction-card'>", unsafe_allow_html=True)
 
         st.markdown("### Prediction")
 
         st.markdown(
-            f"<div class='result'>{predicted_class}</div>",
+            f"<div class='prediction-text'>{predicted_class}</div>",
             unsafe_allow_html=True
         )
 
-        st.progress(float(confidence))
+        st.progress(confidence)
 
         st.write(f"Confidence: **{confidence:.2%}**")
 
+        st.markdown("</div>", unsafe_allow_html=True)
+
 st.divider()
 
-# Footer
 st.markdown(
     "<div class='footer'>Built with ❤️ by <b>Kritarth Joshi</b></div>",
     unsafe_allow_html=True
